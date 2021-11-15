@@ -5,6 +5,7 @@
 #include <iostream>
 #include "SFML/Graphics.hpp"
 #include "SFML/Window.hpp"
+#include <sstream>
 //#include "Menu.h"
 
 using namespace std;
@@ -12,6 +13,7 @@ using namespace sf;
 
 int WindowWidth = 800;
 int WindowHeight = 600;
+
 
 /*float WallsPosition[5][2] = { {0,0},
 {40,40},
@@ -132,33 +134,8 @@ int Path[][2] = { {7, 96}, { 7,101 }, { 7,106 }, { 7,106 }, { 7,111 }, { 7,116 }
 { 362,226 }, { 362,226 }, { 362,231 }, { 362,236 }, { 362,241 }, { 362,246 }, { 362,251 }, { 362,256 }, { 362,261 }, { 362,266 },
 { 362,271 } };
 
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-int Pathmonster[][2] = { {7, 451}, { 7,451 }, { 7,451 }, { 7,451 }, { 12,451 }, { 17,451 }, { 22,451 }, { 27,451 }, { 32,451 }, 
-{ 37,451 }, { 42,451 },{ 47,451 }, { 52,451 }, { 57,451 }, { 62,451 }, { 67,451 }, { 72,451 }, { 77,451 }, { 82,451 }, { 87,451 },
-{ 92,451 },{ 97,451 }, { 102,451 }, { 107,451 }, { 112,451 }, { 117,451 }, { 122,451 }, { 127,451 }, { 132,451 }, { 137,451 }, 
-{ 142,451 },{ 147,451 }, { 152,451 }, { 157,451 }, { 162,451 }, { 167,451 }, { 172,451 }, { 177,451 }, { 182,451 }, { 187,451 }, { 192,451 },
-{ 197,451 }, { 202,451 }, { 207,451 }, { 212,451 }, { 217,451 }, { 222,451 }, { 227,451 }, { 232,451 }, { 237,451 }, { 242,451 },
-{ 247,451 }, { 252,451 }, { 257,451 }, { 262,451 }, { 267,451 }, { 272,451 }, { 277,451 }, { 282,451 }, { 287,451 }, { 292,451 },
-{ 297,451 }, { 302,451 }, { 307,451 }, { 312,451 }, { 317,451 }, { 322,451 }, { 327,451 }, { 332,451 }, { 337,451 }, { 342,451 },
-{ 347,451 }, { 352,451 }, { 357,451 }, { 362,451 }, { 367,451 }, { 372,451 }, { 377,451 }, { 382,451 }, { 387,451 }, { 392,451 },
-{ 397,451 }, { 402,451 }, { 407,451 }, { 412,451 }, { 417,451 }, { 422,451 }, { 427,451 }, { 432,451 }, { 437,451 }, { 442,451 },
-{ 447,451 }, { 452,451 }, { 457,451 }, { 462,451 }, { 467,451 }, { 472,451 }, { 477,451 }, { 482,451 }, { 487,451 }, { 492,451 },
-{ 497,451 }, { 502,451 }, { 507,451 }, { 512,451 }, { 517,451 }, { 522,451 }, { 527,451 }, { 532,451 }, { 537,451 }, { 542,451 },
-{ 547,451 }, { 552,451 }, { 557,451 }, { 562,451 }, { 567,451 }, { 572,451 }, { 577,451 }, { 582,451 }, { 587,451 }, { 592,451 },
-{ 597,451 }, { 602,451 }, { 607,451 }, { 612,451 }, { 617,451 }, { 622,451 }, { 627,451 }, { 632,451 }, { 637,451 }, { 642,451 },
-{ 647,451 }, { 652,451 }, { 657,451 }, { 662,451 }, { 667,451 }, { 672,451 }, { 677,451 }, { 682,451 }, { 687,451 }, { 692,451 },
-{ 697,451 }, { 702,451 }, { 707,451 }, { 712,451 }, { 717,451 }, { 722,451 }, { 727,451 }, { 727,451 }, { 727,451 }, { 727,451 } };
-int Pathmonster_size = sizeof(Pathmonster) / sizeof(int) / 2;
-
-int Pathtempmonster_size = 0;
-int Path_tempmonster[3000][2];
-
-
-/// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int Path_size = sizeof(Path) / sizeof(int) / 2;
 int Path_temp_size = 0;
@@ -220,10 +197,8 @@ int getPath(int source_x, int source_y,int target_x, int target_y,int path[][2],
 	//std::cout << "isVisited_up = " << isVisited_up << ", canGo_up = " << canGo_up << std::endl;
 	//std::cout << "isVisited_down = " << isVisited_down << ", canGo_down = " << canGo_down << std::endl;
 
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////monster////////////////////////////////////////////////////////////////
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////monster///////////////////////////////////////////////////////////////////////////////////////
 
 	int result;
 
@@ -264,7 +239,6 @@ int getPath(int source_x, int source_y,int target_x, int target_y,int path[][2],
 
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////// main ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -280,8 +254,6 @@ int main()
 	int step_index = -1;
 	int monster_path[2000][2];
 	int monster_freeze = 0;
-	int getScore = 0;
-
 
 	std::cout << "Reroute from " << monster_x << "," << monster_y << " to " << moya_x << "," << moya_y << std::endl;
 	VisitedCount = 0;
@@ -297,12 +269,15 @@ int main()
 	//Menu menu(window.getSize().x, window.getSize().y);
 
 	Font font;
+	Font xscore;
 	Texture bg_texture, moya_texture, wall_texture, monster_texture;
 	Texture menu_texture;
 	Texture map_texture;
 	Texture items1_texture, items2_texture, items3_texture, items4_texture;
 	Texture itemsinmap_texture;
 	Texture getitems_texture;
+	Texture coin_texture;
+	Texture win_texture;
 
 	bg_texture.loadFromFile("Texture/Player/background.png");
 	moya_texture.loadFromFile("Texture/Player/moyalasud.png");
@@ -315,22 +290,89 @@ int main()
 	items3_texture.loadFromFile("Texture/Player/clock.png"); //items2
 	items4_texture.loadFromFile("Texture/Player/clock.png"); //items3
 
+	coin_texture.loadFromFile("Texture/Player/item1.png");
 	getitems_texture.loadFromFile("Texture/Player/items.png");
+	win_texture.loadFromFile("Texture/Player/win.png");
 
 	//itemsinmap_texture.loadFromFile("Texture/Player/collecitem.png");
 	font.loadFromFile("Texture/Player/impact.ttf");
+	xscore.loadFromFile("Texture/Player/impact.ttf");
 
-	Text scoretext("SCORE : ", font);
+	int score = 0;
+	std::ostringstream ssScore;
+	ssScore << "Score: " << score;
+
+	Text scoretext("GAME OVER", font);
 	Text name("PIMOLNUT SRIPHADEJKULLACHA 64010605",font);
 	Text pacmoya("MOYA GAME",font,75);
+	Text down("UP >> W // DOWN >> S // LEFT >> A // RIGHT >> D", font);
+
+	// score 
+	sf::Text lblScore;
+	lblScore.setCharacterSize(30);
+	lblScore.setPosition(400, 20);
+	lblScore.setFont(xscore);
+	lblScore.setString(ssScore.str());
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	name.setPosition(400, 70);
 	name.setScale(0.7f, 0.7f);
+
+	down.setScale(0.5f, 0.5f);
+	down.setPosition(500, 580);
 
 	pacmoya.setPosition(10, 5);
 	
 	scoretext.setPosition(400, 40);
 	scoretext.setScale(0.7f,0.7f);
+
+	Sprite win1;
+	win1.setTexture(win_texture);
+	win1.setScale(0.07f, 0.07f);
+
+	Sprite coin1,coin2,coin3,coin4,coin5,coin6,coin7,coin8,coin9,coin10,coin11,coin12,coin13,coin14,coin15;
+	coin1.setTexture(coin_texture);
+	coin1.setScale(0.07f, 0.07f);
+	//coin1.setPosition(292, 101);
+	coin2.setTexture(coin_texture);
+	coin2.setScale(0.07f, 0.07f);
+	//coin2.setPosition(367, 101);
+	coin3.setTexture(coin_texture);
+	coin3.setScale(0.07f, 0.07f);
+	//coin3.setPosition(442, 101);
+	coin4.setTexture(coin_texture);
+	coin4.setScale(0.07f, 0.07f);
+	//coin4.setPosition(517, 101);
+	coin5.setTexture(coin_texture);
+	coin5.setScale(0.07f, 0.07f);
+	//coin5.setPosition(217, 101);
+	coin6.setTexture(coin_texture);
+	coin6.setScale(0.07f, 0.07f);
+	coin7.setTexture(coin_texture);
+	coin7.setScale(0.07f, 0.07f);
+	coin8.setTexture(coin_texture);
+	coin8.setScale(0.07f, 0.07f);
+	coin9.setTexture(coin_texture);
+	coin9.setScale(0.07f, 0.07f);
+	coin10.setTexture(coin_texture);
+	coin10.setScale(0.07f, 0.07f);
+	coin11.setTexture(coin_texture);
+	coin11.setScale(0.07f, 0.07f);
+	coin12.setTexture(coin_texture);
+	coin12.setScale(0.07f, 0.07f);
+	coin13.setTexture(coin_texture);
+	coin13.setScale(0.07f, 0.07f);
+	coin14.setTexture(coin_texture);
+	coin14.setScale(0.07f, 0.07f);
+	coin15.setTexture(coin_texture);
+	coin15.setScale(0.07f, 0.07f);
+
+	// x=292 y=101  1.
+	// x=367 y=101  2.
+	// x=442 y=101  3.
+	// x=517 y=101  4.
+	// x=217 y=101  5.
 
 	Sprite getitems;
 	getitems.setTexture(getitems_texture);
@@ -372,6 +414,7 @@ int main()
 	monster.setPosition(monster_x, monster_y);
 	itemsinmap.setPosition(getitems_x, getitems_y);
 
+	//{702,506},{717,526},{702,546},{677,521}
 	
 	//{362,271},{362,256},{362,241},{362,221}
 	/*items.setPosition(650, 200);
@@ -381,15 +424,43 @@ int main()
 	//items4.setPosition(380, 20);
 
 
+	// x=292 y=101  1.
+	// x=367 y=101  2.
+	// x=442 y=101  3.
+	// x=517 y=101  4.
+	// x=217 y=101  5.
+	///{407,361},{452,361},{452,341},{452,311}
+
+	int coin1_x = 292, coin1_y = 101;
+	int coin2_x = 367, coin2_y = 101;
+	int coin3_x = 442, coin3_y = 101;
+	int coin4_x = 517, coin4_y = 101;
+	int coin5_x = 217, coin5_y = 101;  //+75
+	//down
+	int coin6_x = 217, coin6_y = 460;
+	int coin7_x = 292, coin7_y = 460;
+	int coin8_x = 367, coin8_y = 460;
+	int coin9_x = 442, coin9_y = 460;
+	int coin10_x = 142, coin10_y = 460;
+	int coin11_x = 67,  coin11_y = 460;
+	int coin12_x = 517, coin12_y = 460;
+	int coin13_x = 592, coin13_y = 460;
+	int coin14_x = 667, coin14_y = 460;
+	int coin15_x = 517, coin15_y = 460;
+	
+	int win1_x = 376, win1_y = 271;
+
+	//212, 451
 	int item1_x = 542, item1_y = 146;
-	int item2_x = 187, item2_y = 401;
+	int item2_x = 720, item2_y = 106; //772
 	int item3_x = 7, item3_y = 126;
-	int item4_x = 717, item4_y = 451;
+	int item4_x = 452, item4_y = 361;
+
+	//	x = 452 y = 361
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////open////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 	// main loop
 	while (window.isOpen())
@@ -477,7 +548,6 @@ int main()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////// monster  and item ////////////////////////////////////////////////////
 		
-
 		if (isMoyaAlive)
 		{
 
@@ -508,7 +578,7 @@ int main()
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 			//std::cout << "monster_x" << monster_x << std::endl;
@@ -519,6 +589,24 @@ int main()
 			items2.setPosition(item3_x, item3_y);
 			items3.setPosition(item4_x, item4_y);
 
+			coin1.setPosition(coin1_x, coin1_y);
+			coin2.setPosition(coin2_x, coin2_y);
+			coin3.setPosition(coin3_x, coin3_y);
+			coin4.setPosition(coin4_x, coin4_y);
+			coin5.setPosition(coin5_x, coin5_y);
+			//down
+			coin6.setPosition(coin6_x, coin6_y);
+			coin7.setPosition(coin7_x, coin7_y);
+			coin8.setPosition(coin8_x, coin8_y);
+			coin9.setPosition(coin9_x, coin9_y);
+			coin10.setPosition(coin10_x, coin10_y);
+			coin11.setPosition(coin11_x, coin11_y);
+			coin12.setPosition(coin12_x, coin12_y);
+			coin13.setPosition(coin13_x, coin13_y);
+			coin14.setPosition(coin14_x, coin14_y);
+
+			win1.setPosition(win1_x, win1_y);
+
 			moya.setPosition(moya_x, moya_y);
 			monster.setPosition(monster_x, monster_y);
 
@@ -527,7 +615,6 @@ int main()
 			
 			window.draw(map);
 	
-
 			/*for (int i = 0; i < Path_size; i++)
 			{
 			Sprite moya_tmp;
@@ -536,12 +623,8 @@ int main()
 			moya_tmp.setPosition(Path[i][0], Path[i][1]);
 			window.draw(moya_tmp);
 			}*/
-
-
 ////////////////////////////////////////////////////////////item////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 			/*for (int i = 0; i < Path_size; i++)
 			{
 				Sprite itemmap;
@@ -550,7 +633,6 @@ int main()
 				itemmap.setPosition(Pathitem[i][0], Pathitem[i][1]);
 				window.draw(itemmap);
 			}*/
-
 //////////////score/////////////////////////////////////////////////////////////////////////////////score//////////////////////////////
 //////////////////////////////////////////////////////score////////////////////////////////////////////////////////////////////////
 
@@ -559,22 +641,41 @@ int main()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+			window.draw(coin1);
+			window.draw(coin2);
+			window.draw(coin3);
+			window.draw(coin4);
+			window.draw(coin5);
+			window.draw(coin6);
+			window.draw(coin7);
+			window.draw(coin8);
+			window.draw(coin9);
+			window.draw(coin10);
+			window.draw(coin11);
+			window.draw(coin12);
+			window.draw(coin13);
+			window.draw(coin14);
+
+			window.draw(win1);
+
 			window.draw(items);
 			window.draw(items);
 			window.draw(items2);
 			window.draw(items3);
 			window.draw(items4);
+
 			window.draw(moya);
 			window.draw(monster);
-			window.draw(scoretext);
-			//window.draw(itemsinmap);
+			window.draw(lblScore);
 			window.draw(name);
 			window.draw(pacmoya);
+			window.draw(down);
 			//window.draw(getitems);
-
+			//window.draw(scoretext);
+			//window.draw(itemsinmap);
+					
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////moya get items and monster stop walk///////////////////////////////////////////////////////////////
-
 
 			if (moya_x == monster_x && moya_y == monster_y)
 			{
@@ -589,23 +690,161 @@ int main()
 				//window.draw(scoretext);
 			
 			}
-			if (abs(moya_x - item1_x) < 10 && abs(moya_y - item1_y) < 10)
+			if (abs(moya_x - coin1_x) < 20 && abs(moya_y - coin1_y) < 20)
+			{
+				//std::cout << "Picked item 4 " << std::endl;
+				coin1_x = coin1_y = -1000;
+				score = score + 5;
+				ssScore.str(" ");
+				ssScore << "Score: " << score;
+				lblScore.setString(ssScore.str());
+			}
+			else if (abs(moya_x - coin2_x) < 20 && abs(moya_y - coin2_y) < 20)
+			{
+				//std::cout << "Picked item 4 " << std::endl;
+				coin2_x = coin2_y = -1000;
+				score = score + 5;
+				ssScore.str(" ");
+				ssScore << "Score: " << score;
+				lblScore.setString(ssScore.str());
+			}
+			else if (abs(moya_x - coin3_x) < 20 && abs(moya_y - coin3_y) < 20)
+			{
+				//std::cout << "Picked item 4 " << std::endl;
+				coin3_x = coin3_y = -1000;
+				score = score+5;
+				ssScore.str(" ");
+				ssScore << "Score: " << score;
+				lblScore.setString(ssScore.str());
+			}
+			else if (abs(moya_x - coin4_x) < 20 && abs(moya_y - coin4_y) < 20)
+			{
+				//std::cout << "Picked item 4 " << std::endl;
+				coin4_x = coin4_y = -1000;
+				score = score + 5;
+				ssScore.str(" ");
+				ssScore << "Score: " << score;
+				lblScore.setString(ssScore.str());
+			}
+			else if (abs(moya_x - coin5_x) < 20 && abs(moya_y - coin5_y) < 20)
+			{
+				//std::cout << "Picked item 4 " << std::endl;
+				coin5_x = coin5_y = -1000;
+				score = score + 5;
+				ssScore.str(" ");
+				ssScore << "Score: " << score;
+				lblScore.setString(ssScore.str());
+			}
+			else if (abs(moya_x - coin6_x) < 20 && abs(moya_y - coin6_y) < 20)
+			{
+				//std::cout << "Picked item 4 " << std::endl;
+				coin6_x = coin6_y = -1000;
+				score = score + 5;
+				ssScore.str(" ");
+				ssScore << "Score: " << score;
+				lblScore.setString(ssScore.str());
+			}
+			else if (abs(moya_x - coin7_x) < 20 && abs(moya_y - coin7_y) < 20)
+			{
+				//std::cout << "Picked item 4 " << std::endl;
+				coin7_x = coin7_y = -1000;
+				score = score + 5;
+				ssScore.str(" ");
+				ssScore << "Score: " << score;
+				lblScore.setString(ssScore.str());
+			}
+			else if (abs(moya_x - coin8_x) < 20 && abs(moya_y - coin8_y) < 20)
+			{
+				//std::cout << "Picked item 4 " << std::endl;
+				coin8_x = coin8_y = -1000;
+				score = score + 5;
+				ssScore.str(" ");
+				ssScore << "Score: " << score;
+				lblScore.setString(ssScore.str());
+			}
+			else if (abs(moya_x - coin9_x) < 20 && abs(moya_y - coin9_y) < 20)
+			{
+				//std::cout << "Picked item 4 " << std::endl;
+				coin9_x = coin9_y = -1000;
+				score = score + 5;
+				ssScore.str(" ");
+				ssScore << "Score: " << score;
+				lblScore.setString(ssScore.str());
+			}
+			else if (abs(moya_x - coin10_x) < 20 && abs(moya_y - coin10_y) < 20)
+			{
+				//std::cout << "Picked item 4 " << std::endl;
+				coin10_x = coin10_y = -1000;
+				score = score + 5;
+				ssScore.str(" ");
+				ssScore << "Score: " << score;
+				lblScore.setString(ssScore.str());
+			}
+			else if (abs(moya_x - coin11_x) < 20 && abs(moya_y - coin11_y) < 20)
+			{
+				//std::cout << "Picked item 4 " << std::endl;
+				coin11_x = coin11_y = -1000;
+				score = score + 5;
+				ssScore.str(" ");
+				ssScore << "Score: " << score;
+				lblScore.setString(ssScore.str());
+			}
+			else if (abs(moya_x - coin12_x) < 20 && abs(moya_y - coin12_y) < 20)
+			{
+				//std::cout << "Picked item 4 " << std::endl;
+				coin12_x = coin12_y = -1000;
+				score = score + 5;
+				ssScore.str(" ");
+				ssScore << "Score: " << score;
+				lblScore.setString(ssScore.str());
+			}
+			else if (abs(moya_x - coin13_x) < 20 && abs(moya_y - coin13_y) < 20)
+			{
+			//std::cout << "Picked item 4 " << std::endl;
+				coin13_x = coin13_y = -1000;
+				score = score + 5;
+				ssScore.str(" ");
+				ssScore << "Score: " << score;
+				lblScore.setString(ssScore.str());
+			}
+			else if (abs(moya_x - coin14_x) < 20 && abs(moya_y - coin14_y) < 20)
+			{
+			//std::cout << "Picked item 4 " << std::endl;
+				coin14_x = coin14_y = -1000;
+				score = score + 5;
+				ssScore.str(" ");
+				ssScore << "Score: " << score;
+				lblScore.setString(ssScore.str());
+			}
+			else if (abs(moya_x - item1_x) < 10 && abs(moya_y - item1_y) < 10)
 			{
 				std::cout << "Picked item 1 " << std::endl;
 				monster_freeze = 100;
 				item1_x = item1_y = -1000;
+				/*score++;
+				ssScore.str(" ");
+				ssScore << "Score: " << score;
+				lblScore.setString(ssScore.str());*/
 			}
-			else if (abs(moya_x - item2_x) < 10 && abs(moya_y - item2_y) < 10)
+			else if (abs(moya_x - item2_x) < 20 && abs(moya_y - item2_y) < 20)
 			{
 				std::cout << "Picked item 2 " << std::endl;
 				monster_freeze = 100;
 				item2_x = item2_y = -1000;
+				/*score++;
+				ssScore.str(" ");
+				ssScore << "Score: " << score;
+				lblScore.setString(ssScore.str());*/
 			}
 			else if (abs(moya_x - item3_x) < 10 && abs(moya_y - item3_y) < 10)
 			{
 				std::cout << "Picked item 3 " << std::endl;
 				monster_freeze = 100;
 				item3_x = item3_y = -1000;
+				/*score++;
+				ssScore.str(" ");
+				ssScore << "Score: " << score;
+				lblScore.setString(ssScore.str());*/
 			}
 			else if (abs(moya_x - item4_x) < 10 && abs(moya_y - item4_y) < 10)
 			{
@@ -614,15 +853,11 @@ int main()
 				item4_x = item4_y = -1000;
 			}
 			
-			
 		}
-
+		
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-		
 
 		window.display();
 		sf::sleep(sf::milliseconds(50));
