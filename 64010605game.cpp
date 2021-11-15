@@ -278,6 +278,7 @@ int main()
 	Texture getitems_texture;
 	Texture coin_texture;
 	Texture win_texture;
+	//Texture welcome_texture;
 
 	bg_texture.loadFromFile("Texture/Player/background.png");
 	moya_texture.loadFromFile("Texture/Player/moyalasud.png");
@@ -294,6 +295,8 @@ int main()
 	getitems_texture.loadFromFile("Texture/Player/items.png");
 	win_texture.loadFromFile("Texture/Player/win.png");
 
+//	welcome_texture.loadFromFile("Texture/Player/main menu.png");
+
 	//itemsinmap_texture.loadFromFile("Texture/Player/collecitem.png");
 	font.loadFromFile("Texture/Player/impact.ttf");
 	xscore.loadFromFile("Texture/Player/impact.ttf");
@@ -306,6 +309,8 @@ int main()
 	Text name("PIMOLNUT SRIPHADEJKULLACHA 64010605",font);
 	Text pacmoya("MOYA GAME",font,75);
 	Text down("UP >> W // DOWN >> S // LEFT >> A // RIGHT >> D", font);
+	Text welcome2("HIGH SCORE", font);
+	Text welcome3("EXIT", font);
 
 	// score 
 	sf::Text lblScore;
@@ -318,6 +323,11 @@ int main()
 
 	name.setPosition(400, 70);
 	name.setScale(0.7f, 0.7f);
+
+	welcome2.setPosition(500, 530);
+	welcome2.setScale(1.0f, 1.0f);
+	welcome3.setPosition(730, 530);
+	welcome3.setScale(1.0f, 1.0f);
 
 	down.setScale(0.5f, 0.5f);
 	down.setPosition(500, 580);
@@ -373,6 +383,10 @@ int main()
 	// x=442 y=101  3.
 	// x=517 y=101  4.
 	// x=217 y=101  5.
+
+	/*Sprite welcome1;
+	welcome1.setTexture(welcome_texture);
+	welcome1.setScale(1.05f, 1.05f);*/
 
 	Sprite getitems;
 	getitems.setTexture(getitems_texture);
@@ -540,6 +554,34 @@ int main()
 				std::cout << " y=" << moya_y << std::endl;
 			}
 		}
+		if (welcome2.getGlobalBounds().contains(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y))
+		{
+			welcome2.setFillColor(sf::Color::Red);
+			welcome2.setStyle(sf::Text::Underlined);
+		}
+		else if(welcome3.getGlobalBounds().contains(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y))
+		{
+			welcome3.setFillColor(sf::Color::Red);
+			welcome3.setStyle(sf::Text::Underlined);
+		}
+		else
+		{
+			welcome2.setFillColor(sf::Color::White);
+			welcome3.setFillColor(sf::Color::White);
+		}
+	
+
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+		{
+			if (welcome2.getGlobalBounds().contains(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y))
+			{
+				
+			}
+			else if (welcome3.getGlobalBounds().contains(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y))
+			{
+				window.close();
+			}
+		}
 
 		//std::cout << "moya_x" << moya_x << std::endl;
 		//std::cout << "moya_y" << moya_y << std::endl;
@@ -670,6 +712,10 @@ int main()
 			window.draw(name);
 			window.draw(pacmoya);
 			window.draw(down);
+			window.draw(welcome2);
+			window.draw(welcome3);
+
+	
 			//window.draw(getitems);
 			//window.draw(scoretext);
 			//window.draw(itemsinmap);
