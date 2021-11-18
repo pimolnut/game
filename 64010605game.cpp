@@ -6,6 +6,15 @@
 #include "SFML/Graphics.hpp"
 #include "SFML/Window.hpp"
 #include <sstream>
+#include <utility>
+#include <algorithm>
+#include <string.h>
+#include <string>
+#include <vector>
+#include <stdio.h>
+#include "ScoreList.h"
+
+
 //#include "Menu.h"
 
 using namespace std;
@@ -146,7 +155,6 @@ int WalkStep = 5;
 int Visited_Path[2000][2];
 int VisitedCount = 0;
 
-
 int getPath(int source_x, int source_y,int target_x, int target_y,int path[][2], int step)
 {
 	//std::cout << "GO TO: " << source_x << ", " << source_y;
@@ -241,16 +249,17 @@ int getPath(int source_x, int source_y,int target_x, int target_y,int path[][2],
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////// main ////////////////////////////////////////////////////////////////////////////////////////////
-
+using namespace std;
+void showHighScore(int x, int y, string word, sf::RenderWindow& window, sf::Font* font);
 
 int main()
 {
 	bool isMoyaAlive = true;
-
-	int moya_x = 97;//110;
-	int moya_y = 156;//210;
-	int monster_x = 362;//520; 97
-	int monster_y = 271;//100; 156
+	int state;
+	int moya_x = 7;//110;
+	int moya_y = 126;//210;
+	int monster_x = 722;//520; 97
+	int monster_y = 451;//100; 156   x=722 y=451
 	int step_index = -1;
 	int monster_path[2000][2];
 	int monster_freeze = 0;
@@ -273,34 +282,41 @@ int main()
 	Texture bg_texture, moya_texture, wall_texture, monster_texture;
 	Texture menu_texture;
 	Texture map_texture;
-	Texture items1_texture, items2_texture, items3_texture, items4_texture;
+	Texture items1_texture, items2_texture,items4_texture, items5_texture;
 	Texture itemsinmap_texture;
 	Texture getitems_texture;
 	Texture coin_texture;
 	Texture win_texture;
-	//Texture welcome_texture;
+	Texture welcome_texture;
+	Texture clockitem_texture;
+	Texture newitem_texture;
+	Texture namename_texture;
 
 	bg_texture.loadFromFile("Texture/Player/background.png");
 	moya_texture.loadFromFile("Texture/Player/moyalasud.png");
 	map_texture.loadFromFile("Texture/Player/mapmoya1.png");
 	menu_texture.loadFromFile("Texture/Player/main menu.jpeg");
 	monster_texture.loadFromFile("Texture/Player/monsterlasud.png");
+	namename_texture.loadFromFile("Texture/Player/entername.png");
 
-	items1_texture.loadFromFile("Texture/Player/clock.png"); //items
-	items2_texture.loadFromFile("Texture/Player/clock.png"); //items1
-	items3_texture.loadFromFile("Texture/Player/clock.png"); //items2
-	items4_texture.loadFromFile("Texture/Player/clock.png"); //items3
 
-	coin_texture.loadFromFile("Texture/Player/item1.png");
+	items1_texture.loadFromFile("Texture/Player/itemrerun.png"); //items
+	items2_texture.loadFromFile("Texture/Player/itemrerun.png"); //items1
+	items4_texture.loadFromFile("Texture/Player/itemrerun.png"); //items3
+	items5_texture.loadFromFile("Texture/Player/itemrerun.png"); //items4
+
+	coin_texture.loadFromFile("Texture/Player/newitem.png");
 	getitems_texture.loadFromFile("Texture/Player/items.png");
 	win_texture.loadFromFile("Texture/Player/win.png");
 
-//	welcome_texture.loadFromFile("Texture/Player/main menu.png");
+	welcome_texture.loadFromFile("Texture/Player/main menu.jpeg");
+	clockitem_texture.loadFromFile("Texture/Player/newclock.png");
+	newitem_texture.loadFromFile("Texture/Player/gold.png");
 
 	//itemsinmap_texture.loadFromFile("Texture/Player/collecitem.png");
 	font.loadFromFile("Texture/Player/impact.ttf");
 	xscore.loadFromFile("Texture/Player/impact.ttf");
-
+	
 	int score = 0;
 	std::ostringstream ssScore;
 	ssScore << "Score: " << score;
@@ -308,10 +324,10 @@ int main()
 	Text scoretext("GAME OVER", font);
 	Text name("PIMOLNUT SRIPHADEJKULLACHA 64010605",font);
 	Text pacmoya("MOYA GAME",font,75);
-	Text down("UP >> W // DOWN >> S // LEFT >> A // RIGHT >> D", font);
+	//Text down("UP >> W // DOWN >> S // LEFT >> A // RIGHT >> D", font);
 	Text welcome2("HIGH SCORE", font);
 	Text welcome3("EXIT", font);
-
+	Text entername("",font);
 	// score 
 	sf::Text lblScore;
 	lblScore.setCharacterSize(30);
@@ -321,27 +337,37 @@ int main()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	name.setPosition(400, 70);
+	name.setPosition(500, 70);
 	name.setScale(0.7f, 0.7f);
+	entername.setPosition(535, 185);
+	
 
 	welcome2.setPosition(500, 530);
 	welcome2.setScale(1.0f, 1.0f);
 	welcome3.setPosition(730, 530);
 	welcome3.setScale(1.0f, 1.0f);
 
-	down.setScale(0.5f, 0.5f);
+	/*down.setScale(0.5f, 0.5f);
 	down.setPosition(500, 580);
-
+	*/
 	pacmoya.setPosition(10, 5);
 	
 	scoretext.setPosition(400, 40);
 	scoretext.setScale(0.7f,0.7f);
 
+	Sprite gold1,gold2,gold3;
+	gold1.setTexture(newitem_texture);
+	gold1.setScale(0.10f, 0.10f);
+	gold2.setTexture(newitem_texture);
+	gold2.setScale(0.10f, 0.10f);
+	gold3.setTexture(newitem_texture);
+	gold3.setScale(0.10f, 0.10f);
+
 	Sprite win1;
 	win1.setTexture(win_texture);
 	win1.setScale(0.07f, 0.07f);
 
-	Sprite coin1,coin2,coin3,coin4,coin5,coin6,coin7,coin8,coin9,coin10,coin11,coin12,coin13,coin14,coin15;
+	Sprite coin1,coin2,coin3,coin4,coin5,coin6,coin7,coin8,coin9,coin10,coin11,coin12;
 	coin1.setTexture(coin_texture);
 	coin1.setScale(0.07f, 0.07f);
 	//coin1.setPosition(292, 101);
@@ -371,22 +397,22 @@ int main()
 	coin11.setScale(0.07f, 0.07f);
 	coin12.setTexture(coin_texture);
 	coin12.setScale(0.07f, 0.07f);
-	coin13.setTexture(coin_texture);
-	coin13.setScale(0.07f, 0.07f);
-	coin14.setTexture(coin_texture);
-	coin14.setScale(0.07f, 0.07f);
-	coin15.setTexture(coin_texture);
-	coin15.setScale(0.07f, 0.07f);
 
-	// x=292 y=101  1.
-	// x=367 y=101  2.
-	// x=442 y=101  3.
-	// x=517 y=101  4.
-	// x=217 y=101  5.
+	Sprite clitem1, clitem2, clitem3, clitem4, clitem5;
+	clitem1.setTexture(clockitem_texture);
+	clitem1.setScale(0.10f, 0.10f);
+	clitem2.setTexture(clockitem_texture);
+	clitem2.setScale(0.10f, 0.10f);
+	clitem3.setTexture(clockitem_texture);
+	clitem3.setScale(0.10f, 0.10f);
+	clitem4.setTexture(clockitem_texture);
+	clitem4.setScale(0.10f, 0.10f);
+	clitem5.setTexture(clockitem_texture);
+	clitem5.setScale(0.10f, 0.10f);
 
-	/*Sprite welcome1;
+	Sprite welcome1;
 	welcome1.setTexture(welcome_texture);
-	welcome1.setScale(1.05f, 1.05f);*/
+	welcome1.setScale(1.05f, 1.05f);
 
 	Sprite getitems;
 	getitems.setTexture(getitems_texture);
@@ -396,86 +422,104 @@ int main()
 	moya.setTexture(moya_texture);
 	monster.setTexture(monster_texture);
 
+	Sprite namename1;
+	namename1.setTexture(namename_texture);
+	//namename1.setPosition(-10, 0);
+	
 	Sprite map;
 	map.setTexture(map_texture);
 
-	Sprite items, items2, items3, items4,items5;
+	Sprite items, items2,items4,items5;
 	items.setTexture(items1_texture);
-	items.setTexture(items2_texture);
-	items2.setTexture(items3_texture);
-	items3.setTexture(items4_texture);
+	items2.setTexture(items2_texture);
+	items4.setTexture(items4_texture);
+	items5.setTexture(items5_texture);
 
 	Sprite itemsinmap;
 	itemsinmap.setTexture(itemsinmap_texture);
 
 	items.setScale(0.10f, 0.10f);
-	items.setScale(0.10f, 0.10f);
 	items2.setScale(0.10f, 0.10f);
-	items3.setScale(0.10f, 0.10f);
+	items4.setScale(0.10f, 0.10f);
+	items5.setScale(0.10f, 0.10f);
 
 	getitems.setScale(0.10f, 0.10f);
 
 	bg.setScale(2.0f, 2.0f);
 	moya.setScale(0.100f, 0.100f);
 	map.setScale(1.05f, 1.05f);
+	namename1.setScale(1.00f, 1.00f);
 	monster.setScale(0.100f, 0.100f);
 	
 	int getitems_x = 362, getitems_y = 276;
-	//set background position at 0,0 ( top left )
+	
 	bg.setPosition(0, 0);
 	map.setPosition(-21, -20);
 	moya.setPosition(moya_x, moya_y);
 	monster.setPosition(monster_x, monster_y);
 	itemsinmap.setPosition(getitems_x, getitems_y);
 
-	//{702,506},{717,526},{702,546},{677,521}
-	
-	//{362,271},{362,256},{362,241},{362,221}
-	/*items.setPosition(650, 200);
-	items1.setPosition(380, 520);
-	items2.setPosition(20, 410);
-	items3.setPosition(380, 20);*/
-	//items4.setPosition(380, 20);
-
-
-	// x=292 y=101  1.
-	// x=367 y=101  2.
-	// x=442 y=101  3.
-	// x=517 y=101  4.
-	// x=217 y=101  5.
-	///{407,361},{452,361},{452,341},{452,311}
-
-	int coin1_x = 292, coin1_y = 101;
-	int coin2_x = 367, coin2_y = 101;
-	int coin3_x = 442, coin3_y = 101;
-	int coin4_x = 517, coin4_y = 101;
-	int coin5_x = 217, coin5_y = 101;  //+75
-	//down
-	int coin6_x = 217, coin6_y = 460;
-	int coin7_x = 292, coin7_y = 460;
-	int coin8_x = 367, coin8_y = 460;
-	int coin9_x = 442, coin9_y = 460;
-	int coin10_x = 142, coin10_y = 460;
-	int coin11_x = 67,  coin11_y = 460;
-	int coin12_x = 517, coin12_y = 460;
-	int coin13_x = 592, coin13_y = 460;
-	int coin14_x = 667, coin14_y = 460;
-	int coin15_x = 517, coin15_y = 460;
-	
+	int coin1_x = 288, coin1_y = 373;
+	int coin2_x = 345, coin2_y = 375;
+	int coin3_x = 421, coin3_y = 375;
+	int coin4_x = 467, coin4_y = 375;
+	int coin5_x = 475, coin5_y = 331;  
+	int coin6_x = 285, coin6_y = 331;
+	int coin7_x = 285, coin7_y = 240;
+	int coin8_x = 285, coin8_y = 193;
+	int coin9_x = 467, coin9_y = 196;
+	int coin10_x = 335, coin10_y = 196;
+	int coin11_x = 420,  coin11_y = 196;
+	int coin12_x = 467, coin12_y = 240;
+	///////////////////////////////////////////////////////////
+	int coincl_1_x = 650, coincl_1_y = 180;
+	int coincl_2_x = 630, coincl_2_y = 326;
+	int coincl_3_x = 437, coincl_3_y = 96;
+	int coincl_4_x = 222, coincl_4_y = 451;
+	int coincl_5_x = 482, coincl_5_y = 451;
+	//////////////////////////////////////////////////////////
 	int win1_x = 376, win1_y = 271;
 
-	//212, 451
-	int item1_x = 542, item1_y = 146;
-	int item2_x = 720, item2_y = 106; //772
+	int item1_x = 187, item1_y = 96;
+	int item2_x = 720, item2_y = 106; 
 	int item3_x = 7, item3_y = 126;
-	int item4_x = 452, item4_y = 361;
+	int item4_x = 7, item4_y = 451;
+///////////////////////////////////////////////////////////////////////////
+	int gold_x = 722, gold_y = 451;
+	int gold1_x = 97, gold1_y = 271;
+	int gold2_x = 362, gold2_y = 171;
 
-	//	x = 452 y = 361
+////////////////////////////////////////////////////////////item//////////////////////////////////////////////////////////////////////
+	//coin 1
+	int coin_spawn_1 = 100;
+	int coin_dissapear_1 = 200;
+	//coin 2
+	int coin_spawn_2 = 300;
+	int coin_dissapear_2 = 200;
+	//coin 3
+	int coin_spawn_3 = 400;
+	int coin_dissapear_3 = 200;
+	//coin 4
+	int coin_spawn_4 = 500;
+	int coin_dissapear_4 = 200;
+	//coin 5
+	int coin_spawn_5 = 600;
+	int coin_dissapear_5 = 200;
 
-
+	//gold 1
+	int gold_spawn = 1000;
+	int gold_dissapear = 300;
+	//gold 2
+	int gold_spawn1 = 1500;
+	int gold_dissapear1 = 300;
+	//gold 3
+	int gold_spawn2 = 2000;
+	int gold_dissapear2 = 300;
+	
 /////////////////////////////////////////////////////////////////////////////////////////////open////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+	string enter_name = "";
+	bool is_enter_name = true;
 	// main loop
 	while (window.isOpen())
 	{
@@ -483,6 +527,25 @@ int main()
 
 		while (window.pollEvent(event))
 		{
+			if (event.type == Event::TextEntered && is_enter_name)
+			{
+				if (event.text.unicode == 8)
+				{
+					if (enter_name.size() > 0) enter_name.erase(enter_name.end() - 1);
+				}
+				if (event.text.unicode == 13) // เมื่อกด Enter ให้เริ่มเกมโดยเอาตัวแปร is_enter_name เป็นตัวอ้างอิง
+				{
+					//score_list.addEntry(name, score);
+					is_enter_name = false;
+					enter_name = "";
+					score = rand() % 100;
+				}
+				if ((event.text.unicode >= 'A' && event.text.unicode <= 'Z') || (event.text.unicode >= 'a' && event.text.unicode <= 'z'))
+				{
+					if (enter_name.size() < 10) enter_name.push_back(event.text.unicode);
+				}
+				entername.setString(enter_name + "_");
+			}
 			if (event.type == Event::Closed)
 			{
 				window.close();
@@ -492,7 +555,6 @@ int main()
 			{
 				int dx = 0;
 				int dy = 0;
-
 				if (Keyboard::isKeyPressed(Keyboard::Key::W))
 				{
 					//std::cout << "Key W pressed" << std::endl;
@@ -514,15 +576,16 @@ int main()
 					dx = WalkStep;
 				}
 
-				if (Keyboard::isKeyPressed(Keyboard::Key::Space))
+				/*if (Keyboard::isKeyPressed(Keyboard::Key::Space))
 				{
+					
 					std::cout << "save" << std::endl;
 					Path_temp[Path_temp_size][0] = moya_x + dx;
 					Path_temp[Path_temp_size][1] = moya_y + dy;
 					Path_temp_size++;
 					
-				}
-				else if (Keyboard::isKeyPressed(Keyboard::Key::Enter))
+				}*/
+				/*else if (Keyboard::isKeyPressed(Keyboard::Key::Enter))
 				{
 					std::cout << "{";
 					for (int i = 0; i < Path_temp_size; i++)
@@ -531,7 +594,8 @@ int main()
 
 					}
 					std::cout << "}" << std::endl;
-				}
+				}*/
+				
 
 				if (dx != 0 || dy != 0)
 				{
@@ -539,6 +603,7 @@ int main()
 					int new_moya_y = moya_y + dy;
 					for (int i = 0; i < Path_size; i++)
 					{
+						
 						if (Path[i][0] == new_moya_x && Path[i][1] == new_moya_y)
 						{
 							moya_x = new_moya_x;
@@ -549,11 +614,12 @@ int main()
 					}
 				}
 
-
 				std::cout << " x=" << moya_x;
 				std::cout << " y=" << moya_y << std::endl;
 			}
 		}
+
+
 		if (welcome2.getGlobalBounds().contains(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y))
 		{
 			welcome2.setFillColor(sf::Color::Red);
@@ -590,7 +656,7 @@ int main()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////// monster  and item ////////////////////////////////////////////////////
 		
-		if (isMoyaAlive)
+		if (isMoyaAlive && is_enter_name == false)
 		{
 
 			if (monster_freeze == 0)
@@ -616,291 +682,476 @@ int main()
 			else
 			{
 				monster_freeze--;
-			}
+			}			
+		}
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//std::cout << "monster_x" << monster_x << std::endl;
+		//std::cout << "monster_y" << monster_y << std::endl;
 
+		items.setPosition(item1_x, item1_y);
+		items2.setPosition(item2_x, item2_y);
+		items4.setPosition(item4_x, item4_y);
+		coin1.setPosition(coin1_x, coin1_y);
+		coin2.setPosition(coin2_x, coin2_y);
+		coin3.setPosition(coin3_x, coin3_y);
+		coin4.setPosition(coin4_x, coin4_y);
+		coin5.setPosition(coin5_x, coin5_y);
+		//down
+		coin6.setPosition(coin6_x, coin6_y);
+		coin7.setPosition(coin7_x, coin7_y);
+		coin8.setPosition(coin8_x, coin8_y);
+		coin9.setPosition(coin9_x, coin9_y);
+		coin10.setPosition(coin10_x, coin10_y);
+		coin11.setPosition(coin11_x, coin11_y);
+		coin12.setPosition(coin12_x, coin12_y);
+		
+		///////////////////////////////////////////////////////////////////////
+		clitem1.setPosition(coincl_1_x, coincl_1_y);
+		clitem2.setPosition(coincl_2_x, coincl_2_y);
+		clitem3.setPosition(coincl_3_x, coincl_3_y);
+		clitem4.setPosition(coincl_4_x, coincl_4_y);
+		clitem5.setPosition(coincl_5_x, coincl_5_y);
+		gold1.setPosition(gold_x, gold_y);
+		gold2.setPosition(gold1_x, gold1_y);
+		gold3.setPosition(gold2_x, gold2_y);
+		
+		win1.setPosition(win1_x, win1_y);
 
-			//std::cout << "monster_x" << monster_x << std::endl;
-			//std::cout << "monster_y" << monster_y << std::endl;
+		if(isMoyaAlive && is_enter_name == false) moya.setPosition(moya_x, moya_y);
+		if(isMoyaAlive && is_enter_name == false) monster.setPosition(monster_x, monster_y);
 
-			items.setPosition(item1_x, item1_y);
-			items.setPosition(item2_x, item2_y);
-			items2.setPosition(item3_x, item3_y);
-			items3.setPosition(item4_x, item4_y);
+		window.clear();
+		window.draw(bg);
+		
+		window.draw(map);
 
-			coin1.setPosition(coin1_x, coin1_y);
-			coin2.setPosition(coin2_x, coin2_y);
-			coin3.setPosition(coin3_x, coin3_y);
-			coin4.setPosition(coin4_x, coin4_y);
-			coin5.setPosition(coin5_x, coin5_y);
-			//down
-			coin6.setPosition(coin6_x, coin6_y);
-			coin7.setPosition(coin7_x, coin7_y);
-			coin8.setPosition(coin8_x, coin8_y);
-			coin9.setPosition(coin9_x, coin9_y);
-			coin10.setPosition(coin10_x, coin10_y);
-			coin11.setPosition(coin11_x, coin11_y);
-			coin12.setPosition(coin12_x, coin12_y);
-			coin13.setPosition(coin13_x, coin13_y);
-			coin14.setPosition(coin14_x, coin14_y);
-
-			win1.setPosition(win1_x, win1_y);
-
-			moya.setPosition(moya_x, moya_y);
-			monster.setPosition(monster_x, monster_y);
-
-			window.clear();
-			window.draw(bg);
-			
-			window.draw(map);
-	
-			/*for (int i = 0; i < Path_size; i++)
-			{
-			Sprite moya_tmp;
-			moya_tmp.setTexture(moya_texture);
-			moya_tmp.setScale(0.025f, 0.025f);
-			moya_tmp.setPosition(Path[i][0], Path[i][1]);
-			window.draw(moya_tmp);
-			}*/
+		/*for (int i = 0; i < Path_size; i++)
+		{
+		Sprite moya_tmp;
+		moya_tmp.setTexture(moya_texture);
+		moya_tmp.setScale(0.025f, 0.025f);
+		moya_tmp.setPosition(Path[i][0], Path[i][1]);
+		window.draw(moya_tmp);
+		}*/
 ////////////////////////////////////////////////////////////item////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			/*for (int i = 0; i < Path_size; i++)
-			{
-				Sprite itemmap;
-				itemmap.setTexture(itemsinmap_texture);
-				itemmap.setScale(1.0f, 1.0f);
-				itemmap.setPosition(Pathitem[i][0], Pathitem[i][1]);
-				window.draw(itemmap);
-			}*/
+		/*for (int i = 0; i < Path_size; i++)
+		{
+			Sprite itemmap;
+			itemmap.setTexture(itemsinmap_texture);
+			itemmap.setScale(1.0f, 1.0f);
+			itemmap.setPosition(Pathitem[i][0], Pathitem[i][1]);
+			window.draw(itemmap);
+		}*/
 //////////////score/////////////////////////////////////////////////////////////////////////////////score//////////////////////////////
 //////////////////////////////////////////////////////score////////////////////////////////////////////////////////////////////////
-
-
-
+		
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-			window.draw(coin1);
-			window.draw(coin2);
-			window.draw(coin3);
-			window.draw(coin4);
-			window.draw(coin5);
-			window.draw(coin6);
-			window.draw(coin7);
-			window.draw(coin8);
-			window.draw(coin9);
-			window.draw(coin10);
-			window.draw(coin11);
-			window.draw(coin12);
-			window.draw(coin13);
-			window.draw(coin14);
+		if(isMoyaAlive && is_enter_name == false) 
+		{
+			// Coin 1
+			if (coin_spawn_1 > 0) {
+				clitem1.setPosition(coincl_1_x-1000, coincl_1_y-1000);
+				coin_spawn_1 --;
+			}
+			else if(coin_spawn_1 <= 0) {
+				clitem1.setPosition(coincl_1_x, coincl_1_y);
+				window.draw(clitem1);
 
-			window.draw(win1);
+				if(coin_dissapear_1 > 0) coin_dissapear_1 --;
+				else if(coin_dissapear_1 <= 0) {
+					coin_spawn_1 = 100;
+					coin_dissapear_1 = 100;
+				}
+			}
+			//coin 2
+			if (coin_spawn_2 > 0) {
+				clitem2.setPosition(coincl_2_x - 1000, coincl_2_y - 1000);
+				coin_spawn_2--;
+			}
+			else if (coin_spawn_2 <= 0) {
+				clitem2.setPosition(coincl_2_x, coincl_2_y);
+				window.draw(clitem2);
 
-			window.draw(items);
-			window.draw(items);
-			window.draw(items2);
-			window.draw(items3);
-			window.draw(items4);
+				if (coin_dissapear_2 > 0) coin_dissapear_2--;
+				else if (coin_dissapear_2 <= 0) {
+					coin_spawn_2 = 100;
+					coin_dissapear_2 = 100;
+				}
+			}
+			//coin 3
+			if (coin_spawn_3 > 0) 
+			{
+				clitem3.setPosition(coincl_3_x - 1000, coincl_3_y - 1000);
+				coin_spawn_3--;
+			}
+			else if (coin_spawn_3 <= 0) 
+			{
+				clitem3.setPosition(coincl_3_x, coincl_3_y);
+				window.draw(clitem3);
 
-			window.draw(moya);
-			window.draw(monster);
-			window.draw(lblScore);
-			window.draw(name);
-			window.draw(pacmoya);
-			window.draw(down);
-			window.draw(welcome2);
-			window.draw(welcome3);
+				if (coin_dissapear_3 > 0) coin_dissapear_3--;
+				else if (coin_dissapear_3 <= 0) 
+				{
+					coin_spawn_3 = 100;
+					coin_dissapear_3 = 100;
+				}
+			}
+			//coin 4
+			if (coin_spawn_4 > 0) 
+			{
+				clitem4.setPosition(coincl_4_x - 1000, coincl_4_y - 1000);
+				coin_spawn_4--;
+			}
+			else if (coin_spawn_4 <= 0) 
+			{
+				clitem4.setPosition(coincl_4_x, coincl_4_y);
+				window.draw(clitem4);
 
-	
-			//window.draw(getitems);
-			//window.draw(scoretext);
-			//window.draw(itemsinmap);
-					
+				if (coin_dissapear_4 > 0) coin_dissapear_4--;
+				else if (coin_dissapear_4 <= 0) 
+				{
+					coin_spawn_4 = 100;
+					coin_dissapear_4 = 100;
+				}
+			}
+			//coin 5
+			if (coin_spawn_5 > 0) 
+			{
+				clitem5.setPosition(coincl_5_x - 1000, coincl_5_y - 10000);
+				coin_spawn_5--;
+			}
+			else if (coin_spawn_5 <= 0) 
+			{
+				clitem5.setPosition(coincl_5_x, coincl_5_y);
+				window.draw(clitem5);
+
+				if (coin_dissapear_5 > 0) coin_dissapear_5--;
+				else if (coin_dissapear_5 <= 0) 
+				{
+					coin_spawn_5 = 100;
+					coin_dissapear_5 = 100;
+				}
+			}
+			//gold 1
+			if (gold_spawn > 0)
+			{
+				gold1.setPosition(gold_x-1000, gold_y-1000);
+				gold_spawn--;
+			}
+			else if (gold_spawn <= 0)
+			{
+				gold1.setPosition(gold_x, gold_y);
+				window.draw(gold1);
+
+				if (gold_dissapear > 0) gold_dissapear--;
+				else if (gold_dissapear <= 0)
+				{
+					gold_spawn = 100;
+					gold_dissapear = 100;
+				}
+
+			}
+			//gold 2
+			if (gold_spawn1 > 0)
+			{
+				gold2.setPosition(gold1_x - 1000, gold1_y - 1000);
+				gold_spawn1--;
+			}
+			else if (gold_spawn1 <= 0)
+			{
+				gold2.setPosition(gold1_x, gold1_y);
+				window.draw(gold2);
+
+				if (gold_dissapear1 > 0) gold_dissapear1--;
+				else if (gold_dissapear1 <= 0)
+				{
+					gold_spawn1 = 100;
+					gold_dissapear1 = 100;
+				}
+
+			}
+			//gold 3
+			if (gold_spawn2 > 0)
+			{
+				gold3.setPosition(gold2_x - 1000, gold2_y - 1000);
+				gold_spawn2--;
+			}
+			else if (gold_spawn2 <= 0)
+			{
+				gold3.setPosition(gold2_x, gold2_y);
+				window.draw(gold3);
+
+				if (gold_dissapear2 > 0) gold_dissapear2--;
+				else if (gold_dissapear2 <= 0)
+				{
+					gold_spawn2 = 100;
+					gold_dissapear2 = 100;
+				}
+
+			}
+
+		}
+		
+
+		window.draw(coin1);
+		window.draw(coin2);
+		window.draw(coin3);
+		window.draw(coin4);
+		window.draw(coin5);
+		window.draw(coin6);
+		window.draw(coin7);
+		window.draw(coin8);
+		window.draw(coin9);
+		window.draw(coin10);
+		window.draw(coin11);
+		window.draw(coin12);
+
+		/*window.draw(gold1);
+		window.draw(gold2);
+		window.draw(gold3);
+
+		window.draw(clitem1);
+		window.draw(clitem2);
+		window.draw(clitem3);
+		window.draw(clitem4);
+		window.draw(clitem5);*/
+		//window.draw(win1);
+
+		window.draw(items);
+		window.draw(items2);
+		//window.draw(items3);
+		window.draw(items4);
+
+		window.draw(moya);
+		window.draw(monster);
+		window.draw(lblScore);
+		window.draw(name);
+		window.draw(pacmoya);
+		window.draw(welcome2);
+		window.draw(welcome3);
+		// แสดงผลชื่อที่พิมพ์ได้
+		if (isMoyaAlive && is_enter_name)
+		{
+			window.draw(namename1);
+			window.draw(entername);
+		}
+				
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////moya get items and monster stop walk///////////////////////////////////////////////////////////////
 
-			if (moya_x == monster_x && moya_y == monster_y)
-			{
-				std::cout << "Game Over !!" << std::endl;
-				isMoyaAlive = false;
-				//window.draw(scoretext);
-			}
-			if (abs(moya_x - monster_x) < 10 && abs(moya_y - monster_y) < 10)
-			{
-				//isMoyaAlive = false;
-				moya_x = moya_y = -1000;
-				//window.draw(scoretext);
+		if (moya_x == monster_x && moya_y == monster_y)
+		{
+			isMoyaAlive = false;
 			
-			}
-			if (abs(moya_x - coin1_x) < 20 && abs(moya_y - coin1_y) < 20)
-			{
-				//std::cout << "Picked item 4 " << std::endl;
-				coin1_x = coin1_y = -1000;
-				score = score + 5;
-				ssScore.str(" ");
-				ssScore << "Score: " << score;
-				lblScore.setString(ssScore.str());
-			}
-			else if (abs(moya_x - coin2_x) < 20 && abs(moya_y - coin2_y) < 20)
-			{
-				//std::cout << "Picked item 4 " << std::endl;
-				coin2_x = coin2_y = -1000;
-				score = score + 5;
-				ssScore.str(" ");
-				ssScore << "Score: " << score;
-				lblScore.setString(ssScore.str());
-			}
-			else if (abs(moya_x - coin3_x) < 20 && abs(moya_y - coin3_y) < 20)
-			{
-				//std::cout << "Picked item 4 " << std::endl;
-				coin3_x = coin3_y = -1000;
-				score = score+5;
-				ssScore.str(" ");
-				ssScore << "Score: " << score;
-				lblScore.setString(ssScore.str());
-			}
-			else if (abs(moya_x - coin4_x) < 20 && abs(moya_y - coin4_y) < 20)
-			{
-				//std::cout << "Picked item 4 " << std::endl;
-				coin4_x = coin4_y = -1000;
-				score = score + 5;
-				ssScore.str(" ");
-				ssScore << "Score: " << score;
-				lblScore.setString(ssScore.str());
-			}
-			else if (abs(moya_x - coin5_x) < 20 && abs(moya_y - coin5_y) < 20)
-			{
-				//std::cout << "Picked item 4 " << std::endl;
-				coin5_x = coin5_y = -1000;
-				score = score + 5;
-				ssScore.str(" ");
-				ssScore << "Score: " << score;
-				lblScore.setString(ssScore.str());
-			}
-			else if (abs(moya_x - coin6_x) < 20 && abs(moya_y - coin6_y) < 20)
-			{
-				//std::cout << "Picked item 4 " << std::endl;
-				coin6_x = coin6_y = -1000;
-				score = score + 5;
-				ssScore.str(" ");
-				ssScore << "Score: " << score;
-				lblScore.setString(ssScore.str());
-			}
-			else if (abs(moya_x - coin7_x) < 20 && abs(moya_y - coin7_y) < 20)
-			{
-				//std::cout << "Picked item 4 " << std::endl;
-				coin7_x = coin7_y = -1000;
-				score = score + 5;
-				ssScore.str(" ");
-				ssScore << "Score: " << score;
-				lblScore.setString(ssScore.str());
-			}
-			else if (abs(moya_x - coin8_x) < 20 && abs(moya_y - coin8_y) < 20)
-			{
-				//std::cout << "Picked item 4 " << std::endl;
-				coin8_x = coin8_y = -1000;
-				score = score + 5;
-				ssScore.str(" ");
-				ssScore << "Score: " << score;
-				lblScore.setString(ssScore.str());
-			}
-			else if (abs(moya_x - coin9_x) < 20 && abs(moya_y - coin9_y) < 20)
-			{
-				//std::cout << "Picked item 4 " << std::endl;
-				coin9_x = coin9_y = -1000;
-				score = score + 5;
-				ssScore.str(" ");
-				ssScore << "Score: " << score;
-				lblScore.setString(ssScore.str());
-			}
-			else if (abs(moya_x - coin10_x) < 20 && abs(moya_y - coin10_y) < 20)
-			{
-				//std::cout << "Picked item 4 " << std::endl;
-				coin10_x = coin10_y = -1000;
-				score = score + 5;
-				ssScore.str(" ");
-				ssScore << "Score: " << score;
-				lblScore.setString(ssScore.str());
-			}
-			else if (abs(moya_x - coin11_x) < 20 && abs(moya_y - coin11_y) < 20)
-			{
-				//std::cout << "Picked item 4 " << std::endl;
-				coin11_x = coin11_y = -1000;
-				score = score + 5;
-				ssScore.str(" ");
-				ssScore << "Score: " << score;
-				lblScore.setString(ssScore.str());
-			}
-			else if (abs(moya_x - coin12_x) < 20 && abs(moya_y - coin12_y) < 20)
-			{
-				//std::cout << "Picked item 4 " << std::endl;
-				coin12_x = coin12_y = -1000;
-				score = score + 5;
-				ssScore.str(" ");
-				ssScore << "Score: " << score;
-				lblScore.setString(ssScore.str());
-			}
-			else if (abs(moya_x - coin13_x) < 20 && abs(moya_y - coin13_y) < 20)
-			{
-			//std::cout << "Picked item 4 " << std::endl;
-				coin13_x = coin13_y = -1000;
-				score = score + 5;
-				ssScore.str(" ");
-				ssScore << "Score: " << score;
-				lblScore.setString(ssScore.str());
-			}
-			else if (abs(moya_x - coin14_x) < 20 && abs(moya_y - coin14_y) < 20)
-			{
-			//std::cout << "Picked item 4 " << std::endl;
-				coin14_x = coin14_y = -1000;
-				score = score + 5;
-				ssScore.str(" ");
-				ssScore << "Score: " << score;
-				lblScore.setString(ssScore.str());
-			}
-			else if (abs(moya_x - item1_x) < 10 && abs(moya_y - item1_y) < 10)
-			{
-				std::cout << "Picked item 1 " << std::endl;
-				monster_freeze = 100;
-				item1_x = item1_y = -1000;
-				/*score++;
-				ssScore.str(" ");
-				ssScore << "Score: " << score;
-				lblScore.setString(ssScore.str());*/
-			}
-			else if (abs(moya_x - item2_x) < 20 && abs(moya_y - item2_y) < 20)
-			{
-				std::cout << "Picked item 2 " << std::endl;
-				monster_freeze = 100;
-				item2_x = item2_y = -1000;
-				/*score++;
-				ssScore.str(" ");
-				ssScore << "Score: " << score;
-				lblScore.setString(ssScore.str());*/
-			}
-			else if (abs(moya_x - item3_x) < 10 && abs(moya_y - item3_y) < 10)
-			{
-				std::cout << "Picked item 3 " << std::endl;
-				monster_freeze = 100;
-				item3_x = item3_y = -1000;
-				/*score++;
-				ssScore.str(" ");
-				ssScore << "Score: " << score;
-				lblScore.setString(ssScore.str());*/
-			}
-			else if (abs(moya_x - item4_x) < 10 && abs(moya_y - item4_y) < 10)
-			{
-				std::cout << "Picked item 4 " << std::endl;
-				monster_freeze = 100;
-				item4_x = item4_y = -1000;
-			}
-			
+			//window.draw(scoretext);
 		}
-		
+		if (abs(moya_x - coin1_x) < 30 && abs(moya_y - coin1_y) < 30)
+		{
+			std::cout << "Picked item 1 " << std::endl;
+			coin1_x = coin1_y = -1000;
+			score = score + 5;
+			ssScore.str(" ");
+			ssScore << "Score: " << score;
+			lblScore.setString(ssScore.str());
+		}
+		else if (abs(moya_x - coin2_x) < 30 && abs(moya_y - coin2_y) < 30)
+		{
+			std::cout << "Picked item 2 " << std::endl;
+			coin2_x = coin2_y = -1000;
+			score = score + 5;
+			ssScore.str(" ");
+			ssScore << "Score: " << score;
+			lblScore.setString(ssScore.str());
+		}
+		else if (abs(moya_x - coin3_x) < 30 && abs(moya_y - coin3_y) < 30)
+		{
+			std::cout << "Picked item 3 " << std::endl;
+			coin3_x = coin3_y = -1000;
+			score = score+5;
+			ssScore.str(" ");
+			ssScore << "Score: " << score;
+			lblScore.setString(ssScore.str());
+		}
+		else if (abs(moya_x - coin4_x) < 30 && abs(moya_y - coin4_y) < 30)
+		{
+			std::cout << "Picked item 4 " << std::endl;
+			coin4_x = coin4_y = -1000;
+			score = score + 5;
+			ssScore.str(" ");
+			ssScore << "Score: " << score;
+			lblScore.setString(ssScore.str());
+		}
+		else if (abs(moya_x - coin5_x) < 30 && abs(moya_y - coin5_y) < 30)
+		{
+			std::cout << "Picked item 5 " << std::endl;
+			coin5_x = coin5_y = -1000;
+			score = score + 5;
+			ssScore.str(" ");
+			ssScore << "Score: " << score;
+			lblScore.setString(ssScore.str());
+		}
+		else if (abs(moya_x - coin6_x) < 30 && abs(moya_y - coin6_y) < 30)
+		{
+			std::cout << "Picked item 6 " << std::endl;
+			coin6_x = coin6_y = -1000;
+			score = score + 5;
+			ssScore.str(" ");
+			ssScore << "Score: " << score;
+			lblScore.setString(ssScore.str());
+		}
+		else if (abs(moya_x - coin7_x) < 30 && abs(moya_y - coin7_y) < 30)
+		{
+			std::cout << "Picked item 7 " << std::endl;
+			coin7_x = coin7_y = -1000;
+			score = score + 5;
+			ssScore.str(" ");
+			ssScore << "Score: " << score;
+			lblScore.setString(ssScore.str());
+		}
+		else if (abs(moya_x - coin8_x) < 30 && abs(moya_y - coin8_y) < 30)
+		{
+			std::cout << "Picked item 8 " << std::endl;
+			coin8_x = coin8_y = -1000;
+			score = score + 5;
+			ssScore.str(" ");
+			ssScore << "Score: " << score;
+			lblScore.setString(ssScore.str());
+		}
+		else if (abs(moya_x - coin9_x) < 30 && abs(moya_y - coin9_y) < 30)
+		{
+			std::cout << "Picked item 9 " << std::endl;
+			coin9_x = coin9_y = -1000;
+			score = score + 5;
+			ssScore.str(" ");
+			ssScore << "Score: " << score;
+			lblScore.setString(ssScore.str());
+		}
+		else if (abs(moya_x - coin10_x) < 30 && abs(moya_y - coin10_y) < 30)
+		{
+			std::cout << "Picked item 10 " << std::endl;
+			coin10_x = coin10_y = -1000;
+			score = score + 5;
+			ssScore.str(" ");
+			ssScore << "Score: " << score;
+			lblScore.setString(ssScore.str());
+		}
+		else if (abs(moya_x - coin11_x) < 30 && abs(moya_y - coin11_y) < 30)
+		{
+			std::cout << "Picked item 11 " << std::endl;
+			coin11_x = coin11_y = -1000;
+			score = score + 5;
+			ssScore.str(" ");
+			ssScore << "Score: " << score;
+			lblScore.setString(ssScore.str());
+		}
+		else if (abs(moya_x - coin12_x) < 30 && abs(moya_y - coin12_y) < 30)
+		{
+			std::cout << "Picked item 12 " << std::endl;
+			coin12_x = coin12_y = -1000;
+			score = score + 5;
+			ssScore.str(" ");
+			ssScore << "Score: " << score;
+			lblScore.setString(ssScore.str());
+		}
+		else if (abs(moya_x - coincl_1_x) < 50 && abs(moya_y - coincl_1_y) < 30 && coin_spawn_1 <= 0)
+		{
+			std::cout << "Picked itemcl 1 " << std::endl;
+			coincl_1_x = coincl_1_y = -1000;
+			score = score +20;
+			ssScore.str(" ");
+			ssScore << "Score: " << score;
+			lblScore.setString(ssScore.str());
+		}
+		else if (abs(moya_x - coincl_2_x) < 50 && abs(moya_y - coincl_2_y) < 30 && coin_spawn_2 <= 0)
+		{
+			std::cout << "Picked itemcl 2 " << std::endl;
+			coincl_2_x = coincl_2_y = -1000;
+			score = score+20;
+			ssScore.str(" ");
+			ssScore << "Score: " << score;
+			lblScore.setString(ssScore.str());
+		}
+		else if (abs(moya_x - coincl_3_x) < 30 && abs(moya_y - coincl_3_y) < 30 && coin_spawn_3 <= 0)
+		{
+			std::cout << "Picked itemcl 3 " << std::endl;
+			coincl_3_x = coincl_3_y = -1000;
+			score = score+20;
+			ssScore.str(" ");
+			ssScore << "Score: " << score;
+			lblScore.setString(ssScore.str());
+		}
+		else if (abs(moya_x - coincl_4_x) < 30 && abs(moya_y - coincl_4_y) < 30 && coin_spawn_4 <= 0)
+		{
+			std::cout << "Picked itemcl 4 " << std::endl;
+			coincl_4_x = coincl_4_y = -1000;
+			score = score + 20;
+			ssScore.str(" ");
+			ssScore << "Score: " << score;
+			lblScore.setString(ssScore.str());
+		}
+		else if (abs(moya_x - coincl_5_x) < 30 && abs(moya_y - coincl_5_y) < 30 && coin_spawn_5 <= 0)
+		{
+		std::cout << "Picked itemcl 5 " << std::endl;
+		coincl_5_x = coincl_5_y = -1000;
+		score = score + 20;
+		ssScore.str(" ");
+		ssScore << "Score: " << score;
+		lblScore.setString(ssScore.str());
+		}
+		else if (abs(moya_x - gold_x) < 30 && abs(moya_y - gold_y) < 30 && gold_spawn <= 0)
+		{
+		std::cout << "Picked itemgold 6 " << std::endl;
+		gold_x = gold_y = -1000;
+		score = score + 50;
+		ssScore.str(" ");
+		ssScore << "Score: " << score;
+		lblScore.setString(ssScore.str());
+		}
+		else if (abs(moya_x - gold1_x) < 30 && abs(moya_y - gold1_y) < 30 && gold_spawn1 <= 0)
+		{
+		std::cout << "Picked itemgold 7 " << std::endl;
+		gold1_x = gold1_y = -1000;
+		score = score + 50;
+		ssScore.str(" ");
+		ssScore << "Score: " << score;
+		lblScore.setString(ssScore.str());
+		}
+		else if (abs(moya_x - gold2_x) < 30 && abs(moya_y - gold2_y) < 30 && gold_spawn2 <= 0)
+		{
+		std::cout << "Picked itemgold 8 " << std::endl;
+		gold2_x = gold2_y = -1000;
+		score = score + 50;
+		ssScore.str(" ");
+		ssScore << "Score: " << score;
+		lblScore.setString(ssScore.str());
+		}
+		else if (abs(moya_x - item1_x) < 30 && abs(moya_y - item1_y) < 30)
+		{
+		std::cout << "Picked itemclock 1 " << std::endl;
+		item1_x = item1_y = -1000;
+		monster_freeze = 100;
+		}
+		else if (abs(moya_x - item2_x) < 30 && abs(moya_y - item2_y) < 30)
+		{
+		std::cout << "Picked itemclock 2 " << std::endl;
+		item2_x = item2_y = -1000;
+		monster_freeze = 100;
+		}
+		else if (abs(moya_x - item4_x) < 30 && abs(moya_y - item4_y) < 30)
+		{
+		std::cout << "Picked itemclock 2 " << std::endl;
+		item4_x = item4_y = -1000;
+		monster_freeze = 100;
+		}
+
+	
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
