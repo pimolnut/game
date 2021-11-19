@@ -254,6 +254,8 @@ void showHighScore(int x, int y, string word, sf::RenderWindow& window, sf::Font
 
 int main()
 {
+	ScoreList scorelist("highscore.txt");
+	scorelist.loadFile();
 	bool isMoyaAlive = true;
 	int state;
 	int moya_x = 7;//110;
@@ -282,7 +284,7 @@ int main()
 	Texture bg_texture, moya_texture, wall_texture, monster_texture;
 	Texture menu_texture;
 	Texture map_texture;
-	Texture items1_texture, items2_texture,items4_texture, items5_texture;
+	Texture items1_texture, items2_texture, items4_texture, items5_texture;
 	Texture itemsinmap_texture;
 	Texture getitems_texture;
 	Texture coin_texture;
@@ -291,6 +293,8 @@ int main()
 	Texture clockitem_texture;
 	Texture newitem_texture;
 	Texture namename_texture;
+	Texture gameover_texture;
+	Texture scoreboard_texture;
 
 	bg_texture.loadFromFile("Texture/Player/background.png");
 	moya_texture.loadFromFile("Texture/Player/moyalasud.png");
@@ -298,7 +302,7 @@ int main()
 	menu_texture.loadFromFile("Texture/Player/main menu.jpeg");
 	monster_texture.loadFromFile("Texture/Player/monsterlasud.png");
 	namename_texture.loadFromFile("Texture/Player/entername.png");
-
+	gameover_texture.loadFromFile("Texture/Player/gameover.png");
 
 	items1_texture.loadFromFile("Texture/Player/itemrerun.png"); //items
 	items2_texture.loadFromFile("Texture/Player/itemrerun.png"); //items1
@@ -312,22 +316,24 @@ int main()
 	welcome_texture.loadFromFile("Texture/Player/main menu.jpeg");
 	clockitem_texture.loadFromFile("Texture/Player/newclock.png");
 	newitem_texture.loadFromFile("Texture/Player/gold.png");
-
+	scoreboard_texture.loadFromFile("Texture/Player/scoreboard.png");
 	//itemsinmap_texture.loadFromFile("Texture/Player/collecitem.png");
 	font.loadFromFile("Texture/Player/impact.ttf");
 	xscore.loadFromFile("Texture/Player/impact.ttf");
-	
+
 	int score = 0;
 	std::ostringstream ssScore;
 	ssScore << "Score: " << score;
 
 	Text scoretext("GAME OVER", font);
-	Text name("PIMOLNUT SRIPHADEJKULLACHA 64010605",font);
-	Text pacmoya("MOYA GAME",font,75);
+	Text name("PIMOLNUT SRIPHADEJKULLACHA 64010605", font);
+	Text pacmoya("MOYA GAME", font, 75);
 	//Text down("UP >> W // DOWN >> S // LEFT >> A // RIGHT >> D", font);
 	Text welcome2("HIGH SCORE", font);
 	Text welcome3("EXIT", font);
-	Text entername("",font);
+	Text entername("", font);
+	Text back("BACK", font);
+
 	// score 
 	sf::Text lblScore;
 	lblScore.setCharacterSize(30);
@@ -335,27 +341,44 @@ int main()
 	lblScore.setFont(xscore);
 	lblScore.setString(ssScore.str());
 
+	sf::Text namedisplay;
+	namedisplay.setCharacterSize(30);
+	namedisplay.setPosition(200, 535);
+	namedisplay.setFont(xscore);
+
+	sf::Text showscore;
+	showscore.setCharacterSize(40);
+	showscore.setPosition(520, 400);
+	showscore.setFont(xscore);
+
+	sf::Text showname;
+	showname.setCharacterSize(40);
+	showname.setPosition(200, 400);
+	showname.setFont(xscore);
+
+
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	name.setPosition(500, 70);
+	name.setPosition(400, 70);
 	name.setScale(0.7f, 0.7f);
-	entername.setPosition(535, 185);
-	
+	entername.setPosition(480, 185);
 
-	welcome2.setPosition(500, 530);
-	welcome2.setScale(1.0f, 1.0f);
-	welcome3.setPosition(730, 530);
-	welcome3.setScale(1.0f, 1.0f);
+	welcome2.setPosition(530, 530);
+	welcome2.setScale(1.05f, 1.05f);
+	welcome3.setPosition(700, 530);
+	welcome3.setScale(1.05f, 1.05f);
+	back.setPosition(400, 530);
+	back.setScale(1.05f, 1.05f);
 
 	/*down.setScale(0.5f, 0.5f);
 	down.setPosition(500, 580);
 	*/
 	pacmoya.setPosition(10, 5);
-	
-	scoretext.setPosition(400, 40);
-	scoretext.setScale(0.7f,0.7f);
 
-	Sprite gold1,gold2,gold3;
+	scoretext.setPosition(400, 40);
+	scoretext.setScale(0.7f, 0.7f);
+
+	Sprite gold1, gold2, gold3;
 	gold1.setTexture(newitem_texture);
 	gold1.setScale(0.10f, 0.10f);
 	gold2.setTexture(newitem_texture);
@@ -363,11 +386,22 @@ int main()
 	gold3.setTexture(newitem_texture);
 	gold3.setScale(0.10f, 0.10f);
 
+	Sprite gameover1;
+	gameover1.setTexture(gameover_texture);
+	gameover1.setScale(1.05f, 1.05f);
+	gameover1.setPosition(-21, -20);
+
+
+	Sprite scoreborad;
+	scoreborad.setTexture(scoreboard_texture);
+	scoreborad.setScale(1.05f, 1.05f);
+	scoreborad.setPosition(-21, -20);
+
 	Sprite win1;
 	win1.setTexture(win_texture);
 	win1.setScale(0.07f, 0.07f);
 
-	Sprite coin1,coin2,coin3,coin4,coin5,coin6,coin7,coin8,coin9,coin10,coin11,coin12;
+	Sprite coin1, coin2, coin3, coin4, coin5, coin6, coin7, coin8, coin9, coin10, coin11, coin12;
 	coin1.setTexture(coin_texture);
 	coin1.setScale(0.07f, 0.07f);
 	//coin1.setPosition(292, 101);
@@ -416,7 +450,7 @@ int main()
 
 	Sprite getitems;
 	getitems.setTexture(getitems_texture);
-	
+
 	Sprite bg, moya, monster;
 	bg.setTexture(bg_texture);
 	moya.setTexture(moya_texture);
@@ -425,11 +459,11 @@ int main()
 	Sprite namename1;
 	namename1.setTexture(namename_texture);
 	//namename1.setPosition(-10, 0);
-	
+
 	Sprite map;
 	map.setTexture(map_texture);
 
-	Sprite items, items2,items4,items5;
+	Sprite items, items2, items4, items5;
 	items.setTexture(items1_texture);
 	items2.setTexture(items2_texture);
 	items4.setTexture(items4_texture);
@@ -450,9 +484,9 @@ int main()
 	map.setScale(1.05f, 1.05f);
 	namename1.setScale(1.00f, 1.00f);
 	monster.setScale(0.100f, 0.100f);
-	
+
 	int getitems_x = 362, getitems_y = 276;
-	
+
 	bg.setPosition(0, 0);
 	map.setPosition(-21, -20);
 	moya.setPosition(moya_x, moya_y);
@@ -463,13 +497,13 @@ int main()
 	int coin2_x = 345, coin2_y = 375;
 	int coin3_x = 421, coin3_y = 375;
 	int coin4_x = 467, coin4_y = 375;
-	int coin5_x = 475, coin5_y = 331;  
+	int coin5_x = 475, coin5_y = 331;
 	int coin6_x = 285, coin6_y = 331;
 	int coin7_x = 285, coin7_y = 240;
 	int coin8_x = 285, coin8_y = 193;
 	int coin9_x = 467, coin9_y = 196;
 	int coin10_x = 335, coin10_y = 196;
-	int coin11_x = 420,  coin11_y = 196;
+	int coin11_x = 420, coin11_y = 196;
 	int coin12_x = 467, coin12_y = 240;
 	///////////////////////////////////////////////////////////
 	int coincl_1_x = 650, coincl_1_y = 180;
@@ -481,16 +515,16 @@ int main()
 	int win1_x = 376, win1_y = 271;
 
 	int item1_x = 187, item1_y = 96;
-	int item2_x = 720, item2_y = 106; 
+	int item2_x = 720, item2_y = 106;
 	int item3_x = 7, item3_y = 126;
 	int item4_x = 7, item4_y = 451;
-///////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////
 	int gold_x = 722, gold_y = 451;
 	int gold1_x = 97, gold1_y = 271;
 	int gold2_x = 362, gold2_y = 171;
 
-////////////////////////////////////////////////////////////item//////////////////////////////////////////////////////////////////////
-	//coin 1
+	////////////////////////////////////////////////////////////item//////////////////////////////////////////////////////////////////////
+		//coin 1
 	int coin_spawn_1 = 100;
 	int coin_dissapear_1 = 200;
 	//coin 2
@@ -515,11 +549,14 @@ int main()
 	//gold 3
 	int gold_spawn2 = 2000;
 	int gold_dissapear2 = 300;
-	
-/////////////////////////////////////////////////////////////////////////////////////////////open////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/////////////////////////////////////////////////////////////////////////////////////////////open////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	string enter_name = "";
 	bool is_enter_name = true;
+	bool is_scoreboardshow = false;
+	bool cilkback = false;
+
 	// main loop
 	while (window.isOpen())
 	{
@@ -536,13 +573,12 @@ int main()
 				if (event.text.unicode == 13) // เมื่อกด Enter ให้เริ่มเกมโดยเอาตัวแปร is_enter_name เป็นตัวอ้างอิง
 				{
 					//score_list.addEntry(name, score);
+					namedisplay.setString(enter_name);
 					is_enter_name = false;
-					enter_name = "";
-					score = rand() % 100;
 				}
 				if ((event.text.unicode >= 'A' && event.text.unicode <= 'Z') || (event.text.unicode >= 'a' && event.text.unicode <= 'z'))
 				{
-					if (enter_name.size() < 10) enter_name.push_back(event.text.unicode);
+					if (enter_name.size() < 15) enter_name.push_back(event.text.unicode);
 				}
 				entername.setString(enter_name + "_");
 			}
@@ -578,12 +614,12 @@ int main()
 
 				/*if (Keyboard::isKeyPressed(Keyboard::Key::Space))
 				{
-					
+
 					std::cout << "save" << std::endl;
 					Path_temp[Path_temp_size][0] = moya_x + dx;
 					Path_temp[Path_temp_size][1] = moya_y + dy;
 					Path_temp_size++;
-					
+
 				}*/
 				/*else if (Keyboard::isKeyPressed(Keyboard::Key::Enter))
 				{
@@ -595,7 +631,7 @@ int main()
 					}
 					std::cout << "}" << std::endl;
 				}*/
-				
+
 
 				if (dx != 0 || dy != 0)
 				{
@@ -603,7 +639,7 @@ int main()
 					int new_moya_y = moya_y + dy;
 					for (int i = 0; i < Path_size; i++)
 					{
-						
+
 						if (Path[i][0] == new_moya_x && Path[i][1] == new_moya_y)
 						{
 							moya_x = new_moya_x;
@@ -625,7 +661,7 @@ int main()
 			welcome2.setFillColor(sf::Color::Red);
 			welcome2.setStyle(sf::Text::Underlined);
 		}
-		else if(welcome3.getGlobalBounds().contains(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y))
+		else if (welcome3.getGlobalBounds().contains(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y))
 		{
 			welcome3.setFillColor(sf::Color::Red);
 			welcome3.setStyle(sf::Text::Underlined);
@@ -635,18 +671,19 @@ int main()
 			welcome2.setFillColor(sf::Color::White);
 			welcome3.setFillColor(sf::Color::White);
 		}
-	
+
 
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 		{
 			if (welcome2.getGlobalBounds().contains(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y))
 			{
-				
+				is_scoreboardshow = true;
 			}
 			else if (welcome3.getGlobalBounds().contains(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y))
 			{
 				window.close();
 			}
+
 		}
 
 		//std::cout << "moya_x" << moya_x << std::endl;
@@ -655,10 +692,9 @@ int main()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////// monster  and item ////////////////////////////////////////////////////
-		
+
 		if (isMoyaAlive && is_enter_name == false)
 		{
-
 			if (monster_freeze == 0)
 			{
 				if (step_index != -1 && step_index < step)
@@ -682,14 +718,13 @@ int main()
 			else
 			{
 				monster_freeze--;
-			}			
+			}
 		}
 
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//std::cout << "monster_x" << monster_x << std::endl;
-		//std::cout << "monster_y" << monster_y << std::endl;
+				//std::cout << "monster_x" << monster_x << std::endl;
+				//std::cout << "monster_y" << monster_y << std::endl;
 
 		items.setPosition(item1_x, item1_y);
 		items2.setPosition(item2_x, item2_y);
@@ -707,7 +742,7 @@ int main()
 		coin10.setPosition(coin10_x, coin10_y);
 		coin11.setPosition(coin11_x, coin11_y);
 		coin12.setPosition(coin12_x, coin12_y);
-		
+
 		///////////////////////////////////////////////////////////////////////
 		clitem1.setPosition(coincl_1_x, coincl_1_y);
 		clitem2.setPosition(coincl_2_x, coincl_2_y);
@@ -717,15 +752,15 @@ int main()
 		gold1.setPosition(gold_x, gold_y);
 		gold2.setPosition(gold1_x, gold1_y);
 		gold3.setPosition(gold2_x, gold2_y);
-		
+
 		win1.setPosition(win1_x, win1_y);
 
-		if(isMoyaAlive && is_enter_name == false) moya.setPosition(moya_x, moya_y);
-		if(isMoyaAlive && is_enter_name == false) monster.setPosition(monster_x, monster_y);
+		if (isMoyaAlive && is_enter_name == false) moya.setPosition(moya_x, moya_y);
+		if (isMoyaAlive && is_enter_name == false) monster.setPosition(monster_x, monster_y);
 
 		window.clear();
 		window.draw(bg);
-		
+
 		window.draw(map);
 
 		/*for (int i = 0; i < Path_size; i++)
@@ -736,35 +771,35 @@ int main()
 		moya_tmp.setPosition(Path[i][0], Path[i][1]);
 		window.draw(moya_tmp);
 		}*/
-////////////////////////////////////////////////////////////item////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		/*for (int i = 0; i < Path_size; i++)
-		{
-			Sprite itemmap;
-			itemmap.setTexture(itemsinmap_texture);
-			itemmap.setScale(1.0f, 1.0f);
-			itemmap.setPosition(Pathitem[i][0], Pathitem[i][1]);
-			window.draw(itemmap);
-		}*/
-//////////////score/////////////////////////////////////////////////////////////////////////////////score//////////////////////////////
-//////////////////////////////////////////////////////score////////////////////////////////////////////////////////////////////////
-		
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////item////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				/*for (int i = 0; i < Path_size; i++)
+				{
+					Sprite itemmap;
+					itemmap.setTexture(itemsinmap_texture);
+					itemmap.setScale(1.0f, 1.0f);
+					itemmap.setPosition(Pathitem[i][0], Pathitem[i][1]);
+					window.draw(itemmap);
+				}*/
+				//////////////score/////////////////////////////////////////////////////////////////////////////////score//////////////////////////////
+				//////////////////////////////////////////////////////score////////////////////////////////////////////////////////////////////////
 
-		if(isMoyaAlive && is_enter_name == false) 
+				//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		if (isMoyaAlive && is_enter_name == false)
 		{
 			// Coin 1
 			if (coin_spawn_1 > 0) {
-				clitem1.setPosition(coincl_1_x-1000, coincl_1_y-1000);
-				coin_spawn_1 --;
+				clitem1.setPosition(coincl_1_x - 1000, coincl_1_y - 1000);
+				coin_spawn_1--;
 			}
-			else if(coin_spawn_1 <= 0) {
+			else if (coin_spawn_1 <= 0) {
 				clitem1.setPosition(coincl_1_x, coincl_1_y);
 				window.draw(clitem1);
 
-				if(coin_dissapear_1 > 0) coin_dissapear_1 --;
-				else if(coin_dissapear_1 <= 0) {
+				if (coin_dissapear_1 > 0) coin_dissapear_1--;
+				else if (coin_dissapear_1 <= 0) {
 					coin_spawn_1 = 100;
 					coin_dissapear_1 = 100;
 				}
@@ -785,54 +820,54 @@ int main()
 				}
 			}
 			//coin 3
-			if (coin_spawn_3 > 0) 
+			if (coin_spawn_3 > 0)
 			{
 				clitem3.setPosition(coincl_3_x - 1000, coincl_3_y - 1000);
 				coin_spawn_3--;
 			}
-			else if (coin_spawn_3 <= 0) 
+			else if (coin_spawn_3 <= 0)
 			{
 				clitem3.setPosition(coincl_3_x, coincl_3_y);
 				window.draw(clitem3);
 
 				if (coin_dissapear_3 > 0) coin_dissapear_3--;
-				else if (coin_dissapear_3 <= 0) 
+				else if (coin_dissapear_3 <= 0)
 				{
 					coin_spawn_3 = 100;
 					coin_dissapear_3 = 100;
 				}
 			}
 			//coin 4
-			if (coin_spawn_4 > 0) 
+			if (coin_spawn_4 > 0)
 			{
 				clitem4.setPosition(coincl_4_x - 1000, coincl_4_y - 1000);
 				coin_spawn_4--;
 			}
-			else if (coin_spawn_4 <= 0) 
+			else if (coin_spawn_4 <= 0)
 			{
 				clitem4.setPosition(coincl_4_x, coincl_4_y);
 				window.draw(clitem4);
 
 				if (coin_dissapear_4 > 0) coin_dissapear_4--;
-				else if (coin_dissapear_4 <= 0) 
+				else if (coin_dissapear_4 <= 0)
 				{
 					coin_spawn_4 = 100;
 					coin_dissapear_4 = 100;
 				}
 			}
 			//coin 5
-			if (coin_spawn_5 > 0) 
+			if (coin_spawn_5 > 0)
 			{
 				clitem5.setPosition(coincl_5_x - 1000, coincl_5_y - 10000);
 				coin_spawn_5--;
 			}
-			else if (coin_spawn_5 <= 0) 
+			else if (coin_spawn_5 <= 0)
 			{
 				clitem5.setPosition(coincl_5_x, coincl_5_y);
 				window.draw(clitem5);
 
 				if (coin_dissapear_5 > 0) coin_dissapear_5--;
-				else if (coin_dissapear_5 <= 0) 
+				else if (coin_dissapear_5 <= 0)
 				{
 					coin_spawn_5 = 100;
 					coin_dissapear_5 = 100;
@@ -841,7 +876,7 @@ int main()
 			//gold 1
 			if (gold_spawn > 0)
 			{
-				gold1.setPosition(gold_x-1000, gold_y-1000);
+				gold1.setPosition(gold_x - 1000, gold_y - 1000);
 				gold_spawn--;
 			}
 			else if (gold_spawn <= 0)
@@ -897,7 +932,6 @@ int main()
 			}
 
 		}
-		
 
 		window.draw(coin1);
 		window.draw(coin2);
@@ -927,28 +961,45 @@ int main()
 		window.draw(items2);
 		//window.draw(items3);
 		window.draw(items4);
-
+		window.draw(namedisplay);
 		window.draw(moya);
 		window.draw(monster);
 		window.draw(lblScore);
 		window.draw(name);
 		window.draw(pacmoya);
-		window.draw(welcome2);
+		//window.draw(welcome2);
 		window.draw(welcome3);
+
 		// แสดงผลชื่อที่พิมพ์ได้
 		if (isMoyaAlive && is_enter_name)
 		{
 			window.draw(namename1);
 			window.draw(entername);
+
 		}
-				
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////moya get items and monster stop walk///////////////////////////////////////////////////////////////
+		if (isMoyaAlive == false)
+		{
+			window.draw(gameover1);
+			window.draw(welcome2);
+			window.draw(welcome3);
+			window.draw(showscore);
+			window.draw(showname);
+			
+		}
+
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/////////////////////////////////moya get items and monster stop walk///////////////////////////////////////////////////////////////
 
 		if (moya_x == monster_x && moya_y == monster_y)
 		{
 			isMoyaAlive = false;
-			
+			showscore.setString(to_string(score));
+			showname.setString(enter_name);
+			monster_x = monster_y = -999;
+			scorelist.addEntry(enter_name, score);
+			enter_name = "";
+
 			//window.draw(scoretext);
 		}
 		if (abs(moya_x - coin1_x) < 30 && abs(moya_y - coin1_y) < 30)
@@ -973,7 +1024,7 @@ int main()
 		{
 			std::cout << "Picked item 3 " << std::endl;
 			coin3_x = coin3_y = -1000;
-			score = score+5;
+			score = score + 5;
 			ssScore.str(" ");
 			ssScore << "Score: " << score;
 			lblScore.setString(ssScore.str());
@@ -1063,7 +1114,7 @@ int main()
 		{
 			std::cout << "Picked itemcl 1 " << std::endl;
 			coincl_1_x = coincl_1_y = -1000;
-			score = score +20;
+			score = score + 20;
 			ssScore.str(" ");
 			ssScore << "Score: " << score;
 			lblScore.setString(ssScore.str());
@@ -1072,7 +1123,7 @@ int main()
 		{
 			std::cout << "Picked itemcl 2 " << std::endl;
 			coincl_2_x = coincl_2_y = -1000;
-			score = score+20;
+			score = score + 20;
 			ssScore.str(" ");
 			ssScore << "Score: " << score;
 			lblScore.setString(ssScore.str());
@@ -1081,7 +1132,7 @@ int main()
 		{
 			std::cout << "Picked itemcl 3 " << std::endl;
 			coincl_3_x = coincl_3_y = -1000;
-			score = score+20;
+			score = score + 20;
 			ssScore.str(" ");
 			ssScore << "Score: " << score;
 			lblScore.setString(ssScore.str());
@@ -1097,72 +1148,109 @@ int main()
 		}
 		else if (abs(moya_x - coincl_5_x) < 30 && abs(moya_y - coincl_5_y) < 30 && coin_spawn_5 <= 0)
 		{
-		std::cout << "Picked itemcl 5 " << std::endl;
-		coincl_5_x = coincl_5_y = -1000;
-		score = score + 20;
-		ssScore.str(" ");
-		ssScore << "Score: " << score;
-		lblScore.setString(ssScore.str());
+			std::cout << "Picked itemcl 5 " << std::endl;
+			coincl_5_x = coincl_5_y = -1000;
+			score = score + 20;
+			ssScore.str(" ");
+			ssScore << "Score: " << score;
+			lblScore.setString(ssScore.str());
 		}
 		else if (abs(moya_x - gold_x) < 30 && abs(moya_y - gold_y) < 30 && gold_spawn <= 0)
 		{
-		std::cout << "Picked itemgold 6 " << std::endl;
-		gold_x = gold_y = -1000;
-		score = score + 50;
-		ssScore.str(" ");
-		ssScore << "Score: " << score;
-		lblScore.setString(ssScore.str());
+			std::cout << "Picked itemgold 6 " << std::endl;
+			gold_x = gold_y = -1000;
+			score = score + 50;
+			ssScore.str(" ");
+			ssScore << "Score: " << score;
+			lblScore.setString(ssScore.str());
 		}
 		else if (abs(moya_x - gold1_x) < 30 && abs(moya_y - gold1_y) < 30 && gold_spawn1 <= 0)
 		{
-		std::cout << "Picked itemgold 7 " << std::endl;
-		gold1_x = gold1_y = -1000;
-		score = score + 50;
-		ssScore.str(" ");
-		ssScore << "Score: " << score;
-		lblScore.setString(ssScore.str());
+			std::cout << "Picked itemgold 7 " << std::endl;
+			gold1_x = gold1_y = -1000;
+			score = score + 50;
+			ssScore.str(" ");
+			ssScore << "Score: " << score;
+			lblScore.setString(ssScore.str());
 		}
 		else if (abs(moya_x - gold2_x) < 30 && abs(moya_y - gold2_y) < 30 && gold_spawn2 <= 0)
 		{
-		std::cout << "Picked itemgold 8 " << std::endl;
-		gold2_x = gold2_y = -1000;
-		score = score + 50;
-		ssScore.str(" ");
-		ssScore << "Score: " << score;
-		lblScore.setString(ssScore.str());
+			std::cout << "Picked itemgold 8 " << std::endl;
+			gold2_x = gold2_y = -1000;
+			score = score + 50;
+			ssScore.str(" ");
+			ssScore << "Score: " << score;
+			lblScore.setString(ssScore.str());
 		}
 		else if (abs(moya_x - item1_x) < 30 && abs(moya_y - item1_y) < 30)
 		{
-		std::cout << "Picked itemclock 1 " << std::endl;
-		item1_x = item1_y = -1000;
-		monster_freeze = 100;
+			std::cout << "Picked itemclock 1 " << std::endl;
+			item1_x = item1_y = -1000;
+			monster_freeze = 100;
 		}
 		else if (abs(moya_x - item2_x) < 30 && abs(moya_y - item2_y) < 30)
 		{
-		std::cout << "Picked itemclock 2 " << std::endl;
-		item2_x = item2_y = -1000;
-		monster_freeze = 100;
+			std::cout << "Picked itemclock 2 " << std::endl;
+			item2_x = item2_y = -1000;
+			monster_freeze = 100;
 		}
 		else if (abs(moya_x - item4_x) < 30 && abs(moya_y - item4_y) < 30)
 		{
-		std::cout << "Picked itemclock 2 " << std::endl;
-		item4_x = item4_y = -1000;
-		monster_freeze = 100;
+			std::cout << "Picked itemclock 2 " << std::endl;
+			item4_x = item4_y = -1000;
+			monster_freeze = 100;
 		}
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		if (is_scoreboardshow == true)
+		{
 
-		window.display();
-		sf::sleep(sf::milliseconds(50));
+			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+			{
+				if (back.getGlobalBounds().contains(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y))
+				{
+					is_scoreboardshow = false;
+				}
+			}
+			if (back.getGlobalBounds().contains(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y))
+			{
+				back.setFillColor(sf::Color::Red);
+				back.setStyle(sf::Text::Underlined);
+			}
+			else
+			{
+				back.setFillColor(sf::Color::White);
+			}
+				window.draw(scoreborad);
+				window.draw(back);
+				window.draw(welcome3);
+				Text highscore;
+				highscore.setCharacterSize(30);
+				highscore.setFont(xscore);
+				for (int i = 0; i < scorelist.get().size(); i++) {
 
+					highscore.setPosition(200, 160 + (i * 40));
+					highscore.setString(scorelist.get().at(i).getName());
+					window.draw(highscore);
+				}
+				for (int i = 0; i < scorelist.get().size(); i++) {
+
+					highscore.setPosition(560, 160 + (i * 40));
+					highscore.setString(to_string(scorelist.get().at(i).getScore()));
+					window.draw(highscore);
+				}
+			}
+			window.display();
+			sf::sleep(sf::milliseconds(50));
+
+		}
+		scorelist.saveFile();
+		return 0;
 	}
 
-
-	return 0;
-}
 
 
